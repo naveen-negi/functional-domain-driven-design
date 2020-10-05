@@ -2,32 +2,25 @@
   (:require [library.common.result :as result]
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]
+            [library.placing-on-hold-policies :as policies]
             [cats.core :as m]
+            [library.specs :as specs]
             [cats.builtin :refer :all]
             [cats.monad.either :as either]))
 
 
 ;;specs
-(s/def :patron/patron-id string?)
-(s/def :patron/number-of-holds (s/int-in 0 5))
-
-(s/def ::patron (s/keys :req [:patron/patron-id :patron/number-of-holds]))
-
-(s/def :book/book-id string?)
-(s/def ::book (s/keys :req [:book/book-id]))
-
 ;;faking db calls
 (defn find-book [book-id]
-  nil)
+  (gen/generate (s/gen  ::specs/book)))
 
 (defn find-patron [patron-id]
-  nil)
+  (gen/generate (s/gen ::specs/patron)))
 
 ;;domain entity for book-hold
 (defn book-hold [book patron]
   {:book   book
    :patron patron})
-
 
 (defn patron [patron-id]
   (if-let [patron (find-patron patron-id)]
@@ -39,65 +32,18 @@
     (result/success book)
     (result/failure [:book-not-found])))
 
-(defn validate-book-hold [{:keys [book-id patron-id]}]
-  (m/ap book-hold (book book-id) (patron patron-id)))
+(defn to-book-hold [{:keys [book-id patron-id]}]
+  (result/either-of (m/ap book-hold (book book-id) (patron patron-id)) ))
 
-(validate-book-hold {:patron-id "patron-id" :book-id "book-id"})
+(defn place-hold [book-hold]
+  (let [holds (get-in book-hold [:patron :patron/holds])]
+    (assoc book-hold [:patron :patron/holds] (conj holds (:book book-hold)))))
 
+(defn place-book-on-hold [request]
+  (m/->= (to-book-hold request)
+         policies/regular-patron-maximum-number-of-hold
+         policies/only-research-patron-can-hold-restricted-book
+         policies/overdue-checkouts-rejection
+         place-hold))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(validate-book-hold {:book-id "" :patron-id ""})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#_(defn validate-number-of-book-holds [{:keys [patron] :as book-hold}]
-    (if (< (:patron/number-of-holds patron) 5)
-      (either/right (update-in book-hold [:patron :patron/number-of-holds] inc))
-      (either/left [:exceeded-number-of-allowed-hold])))
-
-#_(defn place-book-on-hold [request]
-    (m/extract (m/->= (validate-book-hold request)
-                      validate-number-of-book-holds) ))
-
-
-
-
-#_(place-book-on-hold {:book-id "" :patron-id ""})
+@(place-book-on-hold {:book-id "book-id" :patron-id "patron-id"} )

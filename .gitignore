@@ -9,3 +9,5 @@ pom.xml.asc
 /.nrepl-port
 /.idea
 /*.iml
+/src/library/.DS_Store
+/.DS_Store

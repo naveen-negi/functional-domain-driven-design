@@ -14,54 +14,12 @@
 (defn success [success]
   (Success. success))
 
-(success 1)
-(failure [:error])
-
-
-(+ 1 2)
-
-(m/ap + (success 1) (success 2))
-
-(m/ap + (failure [:not-a-number]) (success 2))
-
-(m/ap + (failure [:not-a-number]) (failure [:some-other-error]))
-
-
-
-
-
-
-
-
 
 (defn failure? [failure]
   (not (nil? (:errors failure))))
 
 (defn success? [success]
   (not (nil? (:success success))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 (defn either-of [result]
   (if (failure? result)
