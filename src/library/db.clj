@@ -23,7 +23,6 @@
   (swap! books assoc (str (::specs/book-id book) ) book))
 
 (defn- update-if-available? [book-to-update original-book]
-  (prn (::specs/book-state original-book))
   (if (= :available (::specs/book-state original-book))
     (do
       (swap! books assoc (str (::specs/book-id book-to-update) ) book-to-update)

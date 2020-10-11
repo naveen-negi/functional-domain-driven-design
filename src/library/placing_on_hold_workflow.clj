@@ -1,11 +1,8 @@
 (ns library.workflow-with-applicative
-  (:require [library.common.result :as result]
-            [library.placing-on-hold-policies :as policies]
-            [cats.core :as m]
+  (:require [cats.core :as m]
             [library.db :as db]
             [library.book :as book]
-            [library.patron :as patron]
-            [cats.monad.either :as either]))
+            [library.patron :as patron]))
 
 (defn book-hold [book patron]
   {:book   book
