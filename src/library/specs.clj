@@ -22,4 +22,5 @@
 
 ;;Book specs
 (s/def ::type #{:restricted :circulating})
-(s/def ::book (s/keys :req [::book-id ::type ::branch-id]))
+(s/def ::book-state #{:available :on-hold :checked-out})
+(s/def ::book (s/keys :req [::book-id ::type ::branch-id ::book-state]))

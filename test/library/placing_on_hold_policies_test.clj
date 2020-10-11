@@ -9,14 +9,11 @@
 
 (def book (gen/generate (s/gen ::specs/book)))
 
-;; (def branch-ids (gen/sample (s/gen ::specs/branch-id) 3))
-;; (def overdue-checkouts (gen/sample (gen/elements branch-ids) 5) )
-
 (def regular-patron (gen/generate (s/gen ::specs/patron)))
 
 (def patron-with-overdue-checkouts (gen/fmap #(-> %
-                                                  (assoc ::spec/overdue-checkouts (repeat 2 (s/conform ::spec/checkout book))))
-                                             (s/gen ::spec/patron)))
+                                                  (assoc ::specs/overdue-checkouts (repeat 2 (s/conform ::specs/checkout book))))
+                                             (s/gen ::specs/patron)))
 
 (deftest overdue-checkouts-rejection-test
   (testing "should reject if checkouts are overdue in a given branch"
