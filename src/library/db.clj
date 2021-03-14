@@ -2,7 +2,6 @@
   (:require [library.specs :as specs]
             [clojure.spec.gen.alpha :as gen]
             [clojure.spec.alpha :as s]
-            [library.common.result :as result]
             [cats.monad.either :as either]
             [cats.core :as m]))
 
